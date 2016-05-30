@@ -137,9 +137,11 @@ def parser(link):
     LastPage = ''
     ISBN = ''
     DOI = ''
-
-    digit = re.compile(r'\d+')
-    PaperYear = int(digit.findall(soup.find('div',{'id':'biblio-body'}).find_all('tr')[1].find('td',{'class':'va-middle'}).text)[0])
+    try:
+        digit = re.compile(r'\d+')
+        PaperYear = int(digit.findall(soup.find('div',{'id':'biblio-body'}).find_all('tr')[1].find('td',{'class':'va-middle'}).text)[0])
+    except Exception as e:
+        PaperYear = ''
 
     Volume = ''
     Issue = ''
@@ -148,4 +150,5 @@ def parser(link):
             LastPage=LastPage, ISBN=ISBN, DOI=DOI, PaperYear=PaperYear, Volume=Volume, Issue=Issue,
             InsertTime=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"), Crawled='1',
             Finished='0')
+            
     return result
