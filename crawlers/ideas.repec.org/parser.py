@@ -8,8 +8,7 @@ from bs4 import BeautifulSoup
 
 basic_url = 'https://ideas.repec.org'
 
-def parser(link):
-    soup = BeautifulSoup(requests.get(link).content,'html.parser')
+def parser(soup,link):
     # Title
     try:
         Title  = soup.find('div',{'id': 'title'}).h1.text
@@ -150,5 +149,5 @@ def parser(link):
             LastPage=LastPage, ISBN=ISBN, DOI=DOI, PaperYear=PaperYear, Volume=Volume, Issue=Issue,
             InsertTime=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"), Crawled='1',
             Finished='0')
-            
+
     return result

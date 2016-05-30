@@ -7,29 +7,38 @@ import datetime
 from bs4 import BeautifulSoup
 from parser import parser
 
+s = requests.session()
 basic_url = 'https://ideas.repec.org'
 
-def conference_parse(url):
-    resp = requests.get(url)
+def conference_parse(url,result):
+    resp = s.get(url)
     print 'Get the conference/journal page.'
     soup = BeautifulSoup(resp.content, 'html.parser')
     paperlist = soup.find_all('ul',{'class':'paperlist'})
     for pl in paperlist:
+
         li = pl.find_all('li')
 
         for paper in li:
+
             paper_url = paper.b.a.get('href')
-            print 'Capture a paper.'
+            print 'A new paper captured.'
             # return basic_url+paper_url
-            return parser(basic_url+paper_url)
+            soup_paper = BeautifulSoup(s.get(basic_url+paper_url).content,'html.parser')
+
+            result.append(parser(soup_paper,basic_url+paper_url))
+
+            print 'A new paper crawled successfully.'
+
+    print 'One conference or journal finished.'
 
 
 if __name__ == '__main__':
 
-    s = requests.session()
+
     print 'Start to crawl the website...'
 
-    html = requests.get('https://ideas.repec.org/i/pall.html')
+    html = s.get('https://ideas.repec.org/i/pall.html')
     soup = BeautifulSoup(html.content, 'html.parser')
 
     print 'Get the index page.'
@@ -46,9 +55,9 @@ if __name__ == '__main__':
             if len(tr.find_all('td')) is 4:
                 print 'Find a conference or journal.'
                 conference_url = basic_url + tr.find_all('td')[2].a.get('href')
-                result.append(conference_parse(conference_url))
-                print 'Crawl a new paper successfully.'
-                if len(result) is 1000:
+                conference_parse(conference_url,result)
+
+                if len(result) > 1000:
                     for r in result:
-                        f.write(r+'\n')
+                        f.write(str(r)+'\n')
                     result = []
